@@ -63,6 +63,34 @@
       address.select();
     }
   });
+  const contact = document.getElementById('project-contact');
+  if (contact) {
+    const error = document.getElementById('contact-error');
+    const message = 'Укажите номер из 11 цифр, начиная с 8 или +7, либо Telegram: @ и 5–32 латинских буквы, цифры или подчёркивания. Первый символ имени — буква.';
+    function validContact(value) {
+      return /^(?:8|\+7)[0-9]{10}$/.test(value.replace(/[ ()-]/g, '')) || /^@[A-Za-z][A-Za-z0-9_]{4,31}$/.test(value);
+    }
+    let touched = false;
+    function validateContact() {
+      const value = contact.value.trim();
+      const valid = validContact(value);
+      contact.setCustomValidity(valid ? '' : value ? message : 'Укажите телефон или Telegram.');
+      error.textContent = touched && !valid ? contact.validationMessage : '';
+      contact.setAttribute('aria-invalid', String(touched && !valid));
+      return valid;
+    }
+    contact.addEventListener('input', validateContact);
+    contact.addEventListener('blur', () => {
+      touched = true;
+      contact.value = contact.value.trim();
+      validateContact();
+    });
+    contact.addEventListener('invalid', () => { touched = true; validateContact(); });
+    contact.form.addEventListener('submit', event => {
+      touched = true;
+      if (!validateContact()) { event.preventDefault(); contact.reportValidity(); }
+    });
+  }
   const clock = document.querySelector('[data-live-clock]');
   if (clock) {
     const formatter = new Intl.DateTimeFormat('ru-RU', {
